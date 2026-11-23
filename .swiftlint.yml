@@ -1,0 +1,43 @@
+# SwiftLint configuration (runs in CI).
+included:
+  - Sources
+  - Tests
+  - scripts
+
+disabled_rules:
+  # Image/video code uses conventional short names: x, y, w, h, r, c, p, t…
+  - identifier_name
+  # Small tuples (texture, texture, keep-alive) are clearer than one-off structs here.
+  - large_tuple
+  # Metal shaders live in Swift multi-line strings; their lines aren't Swift style.
+  - line_length
+  # Embedded Metal shaders are compiled with `try!` (a failure is a programming error), and the test
+  # harnesses and icon script are command-line tools meant to stop loudly on bad input.
+  - force_try
+  - force_cast
+
+opt_in_rules:
+  - empty_count
+  - first_where
+  - sorted_first_last
+  - contains_over_filter_count
+  - redundant_nil_coalescing
+
+# The engine and Metal interpolator are long by nature (pipeline + embedded shader source).
+type_body_length:
+  warning: 450
+  error: 700
+file_length:
+  warning: 700
+  error: 1000
+function_body_length:
+  warning: 90
+  error: 160
+cyclomatic_complexity:
+  warning: 20
+  error: 35
+nesting:
+  type_level: 2
+  function_level: 4
+
+reporter: xcode

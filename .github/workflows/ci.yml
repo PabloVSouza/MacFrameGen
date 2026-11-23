@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: SwiftLint
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install SwiftLint (if the image lacks it)
+        run: command -v swiftlint >/dev/null || brew install swiftlint
+      - name: Lint
+        run: swiftlint lint --reporter github-actions-logging
+
+  build:
+    name: Build and test
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+      - name: Toolchain
+        run: |
+          sw_vers
+          xcrun swift --version
+          xcrun --show-sdk-version
+      - name: Build app
+        run: ./build.sh
+      - name: Self-tests
+        run: ./scripts/test.sh
+      - name: Compile benchmarks
+        run: ./scripts/bench.sh
+      - name: Package
+        run: ditto -c -k --keepParent build/MacFrameGen.app build/MacFrameGen.zip
+      - uses: actions/upload-artifact@v5
+        with:
+          name: MacFrameGen
+          path: build/MacFrameGen.zip
+          if-no-files-found: error

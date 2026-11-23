@@ -1,0 +1,16 @@
+# Build output
+build/
+
+# macOS
+.DS_Store
+
+# Xcode / SwiftPM (if the project is ever opened in Xcode)
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+.build/
+
+# Test recordings made with --record / --snapshot (large raw frames)
+*.yuv
+recordings/
