@@ -54,9 +54,7 @@ final class Interpolator: FrameInterpolating {
     private let processor = VTFrameProcessor()
     private let sourcePool: CVPixelBufferPool
     private let destinationPool: CVPixelBufferPool
-    private let displayPool: CVPixelBufferPool
     private var copySession: VTPixelTransferSession?
-    private var displaySession: VTPixelTransferSession?
 
     /// Largest frame (long edge / pixel count) Apple's interpolator accepts at 1:1 scale. Measured on an
     /// M3 Pro with macOS 27's `maximumDimension(forSpatialScaleFactor:)`: 1920 / 2 073 600. Kept as
@@ -95,12 +93,6 @@ final class Interpolator: FrameInterpolating {
         sourcePool = try makePool(config.sourcePixelBufferAttributes)
         destinationPool = try makePool(config.destinationPixelBufferAttributes)
         converter = try MetalInterpolator(width: width, height: height, multiplier: 2)
-        displayPool = try makePool([
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
-            kCVPixelBufferWidthKey as String: width,
-            kCVPixelBufferHeightKey as String: height,
-            kCVPixelBufferIOSurfacePropertiesKey as String: [:] as [String: Any],
-        ])
     }
 
     deinit { processor.endSession() }
@@ -124,12 +116,6 @@ final class Interpolator: FrameInterpolating {
     func display(_ buffer: CVPixelBuffer) -> CVPixelBuffer? {
         if CVPixelBufferGetPixelFormatType(buffer) == kCVPixelFormatType_32BGRA { return buffer }
         return converter.display(buffer)
-        var out: CVPixelBuffer?
-        CVPixelBufferPoolCreatePixelBuffer(nil, displayPool, &out)
-        if displaySession == nil { VTPixelTransferSessionCreate(allocator: nil, pixelTransferSessionOut: &displaySession) }
-        guard let out, let displaySession,
-              VTPixelTransferSessionTransferImage(displaySession, from: buffer, to: out) == noErr else { return nil }
-        return out
     }
 
     /// VideoToolbox's session is configured for a fixed number of frames.

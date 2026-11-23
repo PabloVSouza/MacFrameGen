@@ -53,7 +53,9 @@ func buffer(_ luma: [UInt8], _ w: Int, _ h: Int) -> CVPixelBuffer {
     CVPixelBufferLockBaseAddress(b, [])
     let y = CVPixelBufferGetBaseAddressOfPlane(b, 0)!.assumingMemoryBound(to: UInt8.self)
     let ys = CVPixelBufferGetBytesPerRowOfPlane(b, 0)
-    for r in 0..<h { luma.withUnsafeBufferPointer { memcpy(y + r * ys, $0.baseAddress! + r * w, w) } }
+    luma.withUnsafeBufferPointer { src in
+        for r in 0..<h { memcpy(y + r * ys, src.baseAddress! + r * w, w) }
+    }
     memset(CVPixelBufferGetBaseAddressOfPlane(b, 1)!, 128, CVPixelBufferGetBytesPerRowOfPlane(b, 1) * h / 2)
     CVPixelBufferUnlockBaseAddress(b, [])
     return b
@@ -81,7 +83,15 @@ if MTLCreateSystemDefaultDevice() == nil {
     // 2. Frame generation on a known pan: the generated frame must clearly beat a plain blend.
     let cw = 1280, ch = 720, shift = 64
     let big = texture(width: cw + shift, height: ch, seed: 42)
-    func window(_ x0: Int) -> [UInt8] { (0..<ch).flatMap { r in big[(r * (cw + shift) + x0)..<(r * (cw + shift) + x0 + cw)] } }
+    func window(_ x0: Int) -> [UInt8] {
+        var out: [UInt8] = []
+        out.reserveCapacity(cw * ch)
+        for r in 0..<ch {
+            let start = r * (cw + shift) + x0
+            out.append(contentsOf: big[start..<(start + cw)])
+        }
+        return out
+    }
     let a = buffer(window(0), cw, ch), b = buffer(window(shift), cw, ch), truth = window(shift / 2)
     let interp = try MetalInterpolator(width: cw, height: ch, multiplier: 2)
     let sem = DispatchSemaphore(value: 0)
