@@ -41,6 +41,7 @@ on the GPU. It shows them in step with your display.
   outputs HDR (see below).
 - **Records and streams**: the output window can be captured by OBS, QuickTime or ⌘⇧5, and the
   app shares the card with OBS when both are open.
+- **Keeps the Mac awake** while running: no dimming, screen saver or sleep mid-game.
 - **Game window mode**: smooths a game running on the Mac itself, as a click-through overlay.
 
 ## Requirements

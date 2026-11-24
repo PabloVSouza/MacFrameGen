@@ -6,6 +6,11 @@ All notable changes to MacFrameGen are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The Mac and its display stay awake while MacFrameGen is running, so the screen doesn't dim or
+  sleep while you play with a controller.
+
 ## [0.1.0] - 2026-11-24
 
 First release.

@@ -71,7 +71,21 @@ final class AppModel: ObservableObject {
     /// so its 4× mode runs at 720p. The shader does 1080p at both (~4 ms).
     var maxLongEdge: Int { backend == .apple && multiplier >= 4 ? 1280 : 1920 }
     @Published var volume: Float = 1 { didSet { (engine.source as? CaptureCardSource)?.volume = volume } }
-    @Published var running = false
+    @Published var running = false { didSet { if running != oldValue { updateKeepAwake() } } }
+    /// While running, keeps the display and the Mac awake (no screen saver or sleep while you play
+    /// with a controller and never touch the Mac), and keeps macOS from throttling the app.
+    private var keepAwake: NSObjectProtocol?
+
+    private func updateKeepAwake() {
+        if running, keepAwake == nil {
+            keepAwake = ProcessInfo.processInfo.beginActivity(
+                options: [.idleDisplaySleepDisabled, .userInitiated, .latencyCritical],
+                reason: "MacFrameGen is showing the capture card")
+        } else if !running, let token = keepAwake {
+            ProcessInfo.processInfo.endActivity(token)
+            keepAwake = nil
+        }
+    }
     @Published var starting = false
     @Published var stats = FrameGenStats()
     @Published var message: String?
