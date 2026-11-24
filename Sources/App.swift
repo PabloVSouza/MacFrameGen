@@ -26,6 +26,7 @@ struct MacFrameGenApp: App {
             Button(model.running ? "Stop" : "Start") { model.toggleRunning() }
             Toggle("Frame Generation", isOn: $model.interpolationEnabled)
             Divider()
+            Text("Version \(AppVersion.display)")
             Button("Quit") { NSApp.terminate(nil) }
         }
     }
@@ -338,5 +339,15 @@ struct ContentView: View {
         case .window:
             return "Run the game windowed, capped at 30 fps. MacFrameGen covers the window with the smoothed picture; your clicks and keys still go to the game."
         }
+    }
+}
+
+/// The version build.sh stamps into Info.plist from the VERSION file.
+enum AppVersion {
+    static var display: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "\(version) (\(build))"
     }
 }

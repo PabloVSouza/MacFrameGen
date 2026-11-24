@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/PabloVSouza/MacFrameGen/releases/latest"><img src="https://img.shields.io/github/v/release/PabloVSouza/MacFrameGen" alt="Latest release"></a>
   <a href="https://github.com/PabloVSouza/MacFrameGen/actions/workflows/ci.yml"><img src="https://github.com/PabloVSouza/MacFrameGen/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/macOS-26%2B-blue" alt="macOS 26+">
   <img src="https://img.shields.io/badge/Apple%20Silicon-required-lightgrey" alt="Apple Silicon">
@@ -48,7 +49,16 @@ on the GPU. It shows them in step with your display.
 - Xcode Command Line Tools (to build)
 - A UVC capture card. Tested with an Elgato Game Capture Neo and a PS5.
 
-## Build and run
+## Install
+
+Download the latest `MacFrameGen-<version>.zip` from
+[Releases](https://github.com/PabloVSouza/MacFrameGen/releases/latest), unzip it and move
+**MacFrameGen.app** to Applications.
+
+The app isn't notarized, so macOS blocks it the first time. Open it once, then go to
+**System Settings › Privacy & Security** and click **Open Anyway**.
+
+## Build from source
 
 ```bash
 ./build.sh
@@ -59,8 +69,7 @@ The first start asks for Camera access (to read the capture card) and Microphone
 its audio). Game window mode also needs Screen Recording access. The app is ad-hoc signed with a
 fixed identity (`local.macframegen`), so permissions survive rebuilds.
 
-Every CI run also uploads a built `MacFrameGen.zip` as an artifact. It's ad-hoc signed, so the
-first time you open it, right-click the app and choose **Open**.
+Every CI run also uploads a built `MacFrameGen.zip` as an artifact.
 
 ## Using it with a capture card
 
@@ -144,6 +153,18 @@ swift scripts/make-icon.swift   # regenerate Assets/AppIcon.icns
 
 CI (GitHub Actions) runs SwiftLint, builds the app, runs the self-tests and compiles the
 benchmarks on every push and pull request.
+
+### Releases
+
+Versions follow [Semantic Versioning](https://semver.org/); the version lives in `VERSION` and the
+build number is the commit count. To release:
+
+1. In [CHANGELOG.md](CHANGELOG.md), move the notes under `## [Unreleased]` into a new
+   `## [0.2.0] - <date>` section (and add its compare link at the bottom).
+2. Run `scripts/release.sh 0.2.0`. It sets `VERSION`, builds, runs the self-tests, commits,
+   tags `v0.2.0` and pushes.
+3. The Release workflow builds and tests again, then publishes a GitHub release with
+   `MacFrameGen-0.2.0.zip`, its SHA-256 and the changelog notes.
 
 Test flags for live measurements:
 

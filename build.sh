@@ -13,8 +13,13 @@ swiftc -O -swift-version 5 -parse-as-library \
   -o "$APP/Contents/MacOS/MacFrameGen"
 
 cp Info.plist "$APP/Contents/Info.plist"
+# Version from VERSION; build number = commit count, so every commit gets a higher one.
+VERSION=$(tr -d '[:space:]' < VERSION)
+BUILD=$(git rev-list --count HEAD 2>/dev/null || echo 0)
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" \
+  -c "Set :CFBundleVersion $BUILD" "$APP/Contents/Info.plist"
 cp Assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 # A fixed designated requirement keeps the app's identity stable across rebuilds, so macOS
 # remembers the Camera/Microphone permission instead of treating each build as a new app.
 codesign --force --sign - -r='designated => identifier "local.macframegen"' "$APP"
-echo "Built $PWD/$APP"
+echo "Built $PWD/$APP ($VERSION, build $BUILD)"
