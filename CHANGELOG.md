@@ -6,6 +6,8 @@ All notable changes to MacFrameGen are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-25
+
 ### Added
 
 - The Mac and its display stay awake while MacFrameGen is running, so the screen doesn't dim or
@@ -29,5 +31,6 @@ First release.
 - Recordable output window, and sharing the card with OBS.
 - Game window mode for games running on the Mac.
 
-[Unreleased]: https://github.com/PabloVSouza/MacFrameGen/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/PabloVSouza/MacFrameGen/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/PabloVSouza/MacFrameGen/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/PabloVSouza/MacFrameGen/releases/tag/v0.1.0
